@@ -20,11 +20,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import net.argus.beta.com.CardinalSocket;
+import net.argus.cjson.Array;
+import net.argus.cjson.CJSON;
+import net.argus.cjson.CJSONParser;
+import net.argus.cjson.value.CJSONValue;
 import net.argus.file.CardinalFile;
 import net.argus.file.Filter;
 import net.argus.gui.OptionPane;
 import net.argus.prompteur.net.NetworkSystem;
 import net.argus.util.FileChooser;
+import net.argus.util.debug.Debug;
+import net.argus.util.debug.Info;
 
 public class Loader extends JFrame {
 	
@@ -192,7 +199,7 @@ public class Loader extends JFrame {
 					savePattern();
 				case JOptionPane.NO_OPTION:
 					setVisible(false);
-					Main.start(files, netSys);
+					Main.start(files, false, netSys);
 					break;
 					
 				case JOptionPane.CANCEL_OPTION:
@@ -227,14 +234,38 @@ public class Loader extends JFrame {
 		return (e) -> {
 			netSys.setType(NetworkSystem.CLIENT_TYPE);
 			
+			if(!netSys.isNetworkTypeSelected())
+				return;
+			
 			try {
-				netSys.getClient().open();
-				// get filename and content
-				//Main.start0(files, netSys);
+				CardinalSocket sock = netSys.getClient().open();
+				
+				CJSON cjson = CJSONParser.getCJSON(sock.nextString());
+				
+				List<Page> pages = receiveServerConnectionData(cjson);
+				if(pages == null)
+					return;
+				
+				int offY = cjson.getInt("offy");
+				
+				Main.start0(pages, true, offY, netSys);
+				setVisible(false);
 			}catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e1) {
-				e1.printStackTrace();
+				Debug.log("Error on connection", Info.ERROR);
+				netSys.clear();
 			}
 		};
+	}
+	
+	private List<Page> receiveServerConnectionData(CJSON cjson) {
+		Array array = cjson.getArray("pages");
+		
+		List<Page> pages = new ArrayList<Page>();
+		
+		for(CJSONValue page : array.getArray())
+			pages.add(new Page(page.getString("name"), page.getString("text")));
+		
+		return pages;		
 	}
 	
 	private boolean modified() {

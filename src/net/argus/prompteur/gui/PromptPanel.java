@@ -6,7 +6,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +52,8 @@ public class PromptPanel extends JPanel {
 	
 	private Dimension lastDim;
 	
+	private boolean forcePageRepaint = false;
+	
 	private List<Page> pages = new ArrayList<Page>();
 	private int selectedPage = -1;
 	
@@ -62,12 +63,14 @@ public class PromptPanel extends JPanel {
 	
 	
 	@SuppressWarnings("deprecation")
-	public PromptPanel(PromptFrame fen, List<Page> pages, Properties prop) {
+	public PromptPanel(PromptFrame fen, List<Page> pages, int offY, Properties prop) {
 		if(pages.size() == 0)
 			throw new IllegalArgumentException("No page");
 		
 		this.fen = fen;
 		this.pages = pages;
+		
+		this.offY = offY;
 		
 		this.defaultFont = prop.getFont("prompteur.font");
 		this.background = prop.getColor("prompteur.background");
@@ -84,10 +87,10 @@ public class PromptPanel extends JPanel {
 		
 		this.tabSpace = prop.getInt("prompteur.tabspace");
 		
+		fen.getNetworkSystem().setPromptPanel(this);
+		
 		this.timer = new Timer(this, prop);
 		timer.start();
-		
-		addMouseWheelListener(getMouseWheelListener());
 	}
 	
 	@Override
@@ -136,9 +139,10 @@ public class PromptPanel extends JPanel {
         g.setFont(defaultFont);
         g.translate(0, -offY);
 
-        if(getCurrentPage().isEmpty() || lastDim == null || lastDim.height != fen.getSize().height || lastDim.width != fen.getSize().width) {
+        if(getCurrentPage().isEmpty() || forcePageRepaint || lastDim == null || lastDim.height != fen.getSize().height || lastDim.width != fen.getSize().width) {
         	getCurrentPage().setTags(splitTextToFitWidth(text, g, maxWidth));
         	lastDim = fen.getSize();
+        	forcePageRepaint = false;
         }
         
         g.setFont(defaultFont);
@@ -359,13 +363,6 @@ public class PromptPanel extends JPanel {
     	
     	return NONE_TAG;
     }
-        
-    private MouseWheelListener getMouseWheelListener() {
-    	return (e) -> {
-    		timer.addSpeed(-e.getWheelRotation());
-    	};
-    }
-    
     
     public void changeDirection() {
     	direction = -direction;
@@ -414,6 +411,8 @@ public class PromptPanel extends JPanel {
     	if(selectedPage == this.selectedPage)
     		return;
     	
+    	forcePageRepaint();
+    	
     	try {reset();}
     	catch(InterruptedException e) {e.printStackTrace();}
     	
@@ -423,5 +422,13 @@ public class PromptPanel extends JPanel {
     public List<Page> getPages() {
 		return pages;
 	}
+    
+    public void forcePageRepaint() {
+    	this.forcePageRepaint = true;
+    }
+    
+    public int getOffY() {
+    	return offY;
+    }
 
 }

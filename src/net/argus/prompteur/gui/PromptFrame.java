@@ -2,6 +2,7 @@ package net.argus.prompteur.gui;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseWheelListener;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -20,21 +21,36 @@ public class PromptFrame extends JFrame {
 	private PromptPanel pan;
 	
 	private NetworkSystem netSys;
+	
+	private boolean slave;
 
-	public PromptFrame(List<Page> pages, NetworkSystem netSys, Properties prop) {
+	public PromptFrame(List<Page> pages, NetworkSystem netSys, boolean slave, int offY, Properties prop) {
+		this.netSys = netSys;
+		this.slave = slave;
+		
 		setTitle("Prompteur");
 		setDefaultCloseOperation(3);
 		setAlwaysOnTop(prop.getBoolean("prompteur.frame.alwaysontop"));
 		setSize(prop.getDimension("prompteur.frame.size"));
 		setResizable(prop.getBoolean("prompteur.frame.resizable"));
 		setLocationRelativeTo(null);
-		pan = new PromptPanel(this, pages, prop);
+		pan = new PromptPanel(this, pages, offY, prop);
 		
 		addKeyListener(getKeyListener());
+		addMouseWheelListener(getMouseWheelListener());
+		
 		setContentPane(pan);
 		
-		this.netSys = netSys;
 	}
+	
+    private MouseWheelListener getMouseWheelListener() {
+    	return (e) -> {
+    		if(slave)
+    			return;
+    		
+    		pan.getTimer().addSpeed(-e.getWheelRotation());
+    	};
+    }
 	
 	private KeyListener getKeyListener() {
     	return new KeyListener() {
@@ -48,26 +64,29 @@ public class PromptFrame extends JFrame {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				try {
-					if(e.getKeyCode() == KeyEvent.VK_LESS) {
-						pan.changeDirection();
-					}
-					
 					if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_M) {
 						pan.getTimer().getMonitorFrame().setVisible(true);
 					}
 					
+					if(slave)
+						return;
+					
+					if(e.getKeyCode() == KeyEvent.VK_LESS) {
+						changeDirection();
+					}
+					
 					if(e.getKeyCode() == KeyEvent.VK_SPACE) {
 						if(e.isControlDown())
-							pan.getTimer().setSpeed(0);
-							pan.getTimer().waitStart();
+							resetSpeed();
+						startStop();
 					}
 					
 					if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-						pan.reset();
+						reset();
 					}
 					
 					if(e.getKeyCode() == KeyEvent.VK_DELETE) {
-						pan.getTimer().setSpeed(0);
+						resetSpeed();
 					}
 					
 					if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_O) {
@@ -82,6 +101,23 @@ public class PromptFrame extends JFrame {
 			}
 		};
     }
+	
+	public void changeDirection() {
+		pan.changeDirection();
+	}
+	
+	public void startStop() throws InterruptedException {
+		pan.getTimer().waitStart();
+	}
+	
+	public void reset() throws InterruptedException {
+		pan.reset();
+	}
+	
+	public void resetSpeed() {
+		pan.getTimer().setSpeed(0);
+
+	}
 	
 	public boolean isNetworkReady() {
 		return netSys!=null;

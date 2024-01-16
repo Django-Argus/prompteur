@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
+import net.argus.prompteur.gui.PromptPanel;
 import net.argus.util.debug.Debug;
 import net.argus.util.debug.Info;
 
@@ -20,6 +21,8 @@ public class NetworkSystem {
 	
 	private PrompteurServer server = null;
 	private PrompteurClient client = null;
+	
+	private PromptPanel promptPanel;
 	
 	public NetworkSystem() {}
 	
@@ -43,7 +46,7 @@ public class NetworkSystem {
 		try {
 			switch(type) {
 				case SERVER_TYPE:
-					server = new PrompteurServer(PROMPTEUR_DEFAULT_PORT);
+					server = new PrompteurServer(PROMPTEUR_DEFAULT_PORT, this);
 					break;
 					
 				case CLIENT_TYPE:
@@ -61,6 +64,7 @@ public class NetworkSystem {
 			}
 		}catch(IOException e) {
 			Debug.log("Network creation error", Info.ERROR);
+			type = UNKNOWN_TYPE;
 		}
 	}
 	
@@ -83,4 +87,17 @@ public class NetworkSystem {
 	public PrompteurServer getServer() {
 		return server;
 	}
+	
+	public boolean isNetworkTypeSelected() {
+		return type!=UNKNOWN_TYPE;
+	}
+	
+	public void setPromptPanel(PromptPanel promptPanel) {
+		this.promptPanel = promptPanel;
+	}
+	
+	public PromptPanel getPromptPanel() {
+		return promptPanel;
+	}
+	
 }

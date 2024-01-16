@@ -16,7 +16,6 @@ import net.argus.file.Properties;
 import net.argus.gui.OptionPane;
 import net.argus.prompteur.gui.PromptFrame;
 import net.argus.prompteur.net.NetworkSystem;
-import net.argus.util.DoubleStock;
 
 public class Main {
 	
@@ -32,7 +31,7 @@ public class Main {
 		}
 	}
 	
-	public static void start(List<File> files, NetworkSystem netSys) {
+	public static void start(List<File> files, boolean slave, NetworkSystem netSys) {
 		List<Page> pages = new ArrayList<Page>();
 		for(File file : files) {
 			String txt = readText(file);
@@ -46,15 +45,11 @@ public class Main {
 			return;
 		}
 
-		PromptFrame fen = new PromptFrame(pages, netSys, prop);
+		PromptFrame fen = new PromptFrame(pages, netSys, slave, 0, prop);
 		fen.setVisible(true);
 	}
 	
-	public static void start0(List<DoubleStock<String, String>> files, NetworkSystem netSys) {
-		List<Page> pages = new ArrayList<Page>();
-		for(DoubleStock<String, String> file : files)
-			pages.add(new Page(file.getFirst(), file.getSecond()));
-		
+	public static void start0(List<Page> pages, boolean slave, int offY, NetworkSystem netSys) {
 		Properties prop = new Properties(new File("config.properties"));
 		if(!prop.exists()) {
 			OptionPane.showErrorDialog(null, "Prompteur", new FileNotFoundException("config.properties not found"));
@@ -62,7 +57,7 @@ public class Main {
 			return;
 		}
 
-		PromptFrame fen = new PromptFrame(pages, netSys, prop);
+		PromptFrame fen = new PromptFrame(pages, netSys, slave, offY, prop);
 		fen.setVisible(true);
 	}
 	

@@ -19,7 +19,7 @@ public class PrompteurClient extends Client {
 	@Override
 	public CardinalSocket open() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
 		CardinalSocket sock = super.open();
-		JOptionPane.showMessageDialog(null, "The client was opened on port 111", "NetworkSystem", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(null, "The client was connected", "NetworkSystem", JOptionPane.INFORMATION_MESSAGE);
 		return sock;
 	}
 
