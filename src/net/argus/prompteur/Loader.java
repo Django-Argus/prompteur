@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,7 @@ import javax.swing.JScrollPane;
 import net.argus.file.CardinalFile;
 import net.argus.file.Filter;
 import net.argus.gui.OptionPane;
+import net.argus.prompteur.net.NetworkSystem;
 import net.argus.util.FileChooser;
 
 public class Loader extends JFrame {
@@ -56,9 +59,12 @@ public class Loader extends JFrame {
 	private JPanel southPanel;
 	
 	private JButton loadButton;
+	private JButton connectButton;
 	private JButton startButton;
 	
 	private JList<String> list;
+	
+	private NetworkSystem netSys;
 	
 	public Loader() {
 		setTitle("Loader");
@@ -66,6 +72,8 @@ public class Loader extends JFrame {
 		setSize(600, 450);
 		setLocationRelativeTo(null);
 		setResizable(false);
+		
+		netSys = new NetworkSystem();
 		
 		mainPan = new JPanel();
 		mainPan.setLayout(new BorderLayout());
@@ -92,6 +100,9 @@ public class Loader extends JFrame {
 		loadButton = new JButton("Load");
 		loadButton.addActionListener(getLoadActionListener());
 		
+		connectButton = new JButton("Connect");
+		connectButton.addActionListener(getConnectActionListener());
+		
 		startButton = new JButton("Start");
 		startButton.addActionListener(getStartActionListener());
 		
@@ -106,6 +117,7 @@ public class Loader extends JFrame {
 		eastPanel.add(downButton);
 		
 		southPanel.add(loadButton);
+		southPanel.add(connectButton);
 		southPanel.add(startButton);
 		
 		mainPan.add(BorderLayout.CENTER, pan);
@@ -142,8 +154,8 @@ public class Loader extends JFrame {
 			files.set(index, files.get(index-1));
 			files.set(index-1, temp);
 			
-			listModel.set(index, getFileName(files.get(index)));
-			listModel.set(index-1, getFileName(files.get(index-1)));
+			listModel.set(index, getPageName(files.get(index)));
+			listModel.set(index-1, getPageName(files.get(index-1)));
 
 			list.setSelectedIndex(index-1);
 		};
@@ -159,8 +171,8 @@ public class Loader extends JFrame {
 			files.set(index, files.get(index+1));
 			files.set(index+1, temp);
 			
-			listModel.set(index, getFileName(files.get(index)));
-			listModel.set(index+1, getFileName(files.get(index+1)));
+			listModel.set(index, getPageName(files.get(index)));
+			listModel.set(index+1, getPageName(files.get(index+1)));
 
 			list.setSelectedIndex(index+1);
 		};
@@ -180,7 +192,7 @@ public class Loader extends JFrame {
 					savePattern();
 				case JOptionPane.NO_OPTION:
 					setVisible(false);
-					Main.start(files);
+					Main.start(files, netSys);
 					break;
 					
 				case JOptionPane.CANCEL_OPTION:
@@ -211,6 +223,20 @@ public class Loader extends JFrame {
 		};
 	}
 	
+	private ActionListener getConnectActionListener() {
+		return (e) -> {
+			netSys.setType(NetworkSystem.CLIENT_TYPE);
+			
+			try {
+				netSys.getClient().open();
+				// get filename and content
+				//Main.start0(files, netSys);
+			}catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e1) {
+				e1.printStackTrace();
+			}
+		};
+	}
+	
 	private boolean modified() {
 		if(files.size() != openedList.size())
 			return true;
@@ -221,7 +247,7 @@ public class Loader extends JFrame {
 		return false;
 	}
 	
-	public static String getFileName(File file) {
+	public static String getPageName(File file) {
 		return file.getName().substring(0, file.getName().indexOf('.'));
 	}
 	
@@ -232,7 +258,7 @@ public class Loader extends JFrame {
 	private void savePattern() {
 		File f = showSaveFileChooser();
 		
-		if(!f.getName().endsWith(".promptpattern"))
+		if(!f.getName().endsWith(".promptpattestart0rn"))
 			f = new File(f.getAbsoluteFile() + ".promptpattern");
 		
 		try {
@@ -278,7 +304,7 @@ public class Loader extends JFrame {
 		}
 		
 		files.add(file);
-		listModel.addElement(getFileName(file));	
+		listModel.addElement(getPageName(file));	
 	}
 	
 }

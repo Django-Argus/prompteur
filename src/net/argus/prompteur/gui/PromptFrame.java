@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 
 import net.argus.file.Properties;
 import net.argus.prompteur.Page;
+import net.argus.prompteur.net.NetworkSystem;
 
 public class PromptFrame extends JFrame {
 	
@@ -17,8 +18,10 @@ public class PromptFrame extends JFrame {
 	private static final long serialVersionUID = -2453487625181132844L;
 	
 	private PromptPanel pan;
+	
+	private NetworkSystem netSys;
 
-	public PromptFrame(List<Page> pages, Properties prop) {
+	public PromptFrame(List<Page> pages, NetworkSystem netSys, Properties prop) {
 		setTitle("Prompteur");
 		setDefaultCloseOperation(3);
 		setAlwaysOnTop(prop.getBoolean("prompteur.frame.alwaysontop"));
@@ -29,6 +32,8 @@ public class PromptFrame extends JFrame {
 		
 		addKeyListener(getKeyListener());
 		setContentPane(pan);
+		
+		this.netSys = netSys;
 	}
 	
 	private KeyListener getKeyListener() {
@@ -64,11 +69,26 @@ public class PromptFrame extends JFrame {
 					if(e.getKeyCode() == KeyEvent.VK_DELETE) {
 						pan.getTimer().setSpeed(0);
 					}
+					
+					if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_O) {
+						netSys.setType(NetworkSystem.SERVER_TYPE);
+						
+						netSys.getServer().open();
+					}
+					
 				}catch(InterruptedException e1) {
 					e1.printStackTrace();
 				}
 			}
 		};
     }
+	
+	public boolean isNetworkReady() {
+		return netSys!=null;
+	}
+	
+	public NetworkSystem getNetworkSystem() {
+		return netSys;
+	}
 
 }

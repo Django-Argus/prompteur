@@ -15,6 +15,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import net.argus.file.Properties;
 import net.argus.gui.OptionPane;
 import net.argus.prompteur.gui.PromptFrame;
+import net.argus.prompteur.net.NetworkSystem;
+import net.argus.util.DoubleStock;
 
 public class Main {
 	
@@ -30,11 +32,11 @@ public class Main {
 		}
 	}
 	
-	public static void start(List<File> files) {
+	public static void start(List<File> files, NetworkSystem netSys) {
 		List<Page> pages = new ArrayList<Page>();
 		for(File file : files) {
 			String txt = readText(file);
-			pages.add(new Page(Loader.getFileName(file), txt));
+			pages.add(new Page(Loader.getPageName(file), txt));
 		}
 		
 		Properties prop = new Properties(new File("config.properties"));
@@ -44,7 +46,23 @@ public class Main {
 			return;
 		}
 
-		PromptFrame fen = new PromptFrame(pages, prop);
+		PromptFrame fen = new PromptFrame(pages, netSys, prop);
+		fen.setVisible(true);
+	}
+	
+	public static void start0(List<DoubleStock<String, String>> files, NetworkSystem netSys) {
+		List<Page> pages = new ArrayList<Page>();
+		for(DoubleStock<String, String> file : files)
+			pages.add(new Page(file.getFirst(), file.getSecond()));
+		
+		Properties prop = new Properties(new File("config.properties"));
+		if(!prop.exists()) {
+			OptionPane.showErrorDialog(null, "Prompteur", new FileNotFoundException("config.properties not found"));
+			System.exit(1);
+			return;
+		}
+
+		PromptFrame fen = new PromptFrame(pages, netSys, prop);
 		fen.setVisible(true);
 	}
 	
