@@ -17,7 +17,7 @@ public class Timer extends Thread {
 		
 	private MonitorFrame monitorFrame;
 		
-	public Timer(PromptPanel panel, int speed, boolean playing, Properties prop) {
+	public Timer(PromptPanel panel, boolean slave, int speed, boolean playing, Properties prop) {
 		this.panel = panel;
 		this.speed = speed;
 		this.wait = !playing;
@@ -28,7 +28,7 @@ public class Timer extends Thread {
 		
 		this.m = (float) ((float) (maxFPS - minFPS) / (float) maxSpeed);
 
-		this.monitorFrame = new MonitorFrame(this, prop);
+		this.monitorFrame = new MonitorFrame(this, slave, prop);
 		monitorFrame.setVisible(true);
 	}
 	

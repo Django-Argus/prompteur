@@ -1,5 +1,8 @@
 package net.argus.prompteur.gui;
 
+import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseWheelEvent;
@@ -16,7 +19,7 @@ import net.argus.prompteur.net.event.EventNetworkSystem;
 import net.argus.prompteur.net.event.NetworkSystemEvent;
 import net.argus.prompteur.net.event.NetworkSystemListener;
 
-public class PromptFrame extends JFrame implements KeyListener, MouseWheelListener, NetworkSystemListener {
+public class PromptFrame extends JFrame implements KeyListener, MouseWheelListener, NetworkSystemListener, ComponentListener {
 	
 	/**
 	 * 
@@ -29,23 +32,26 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
 	
 	private boolean slave;
 
-	public PromptFrame(List<Page> pages, NetworkSystem netSys, boolean slave, int offY, int speed, int direction, boolean playing, Properties prop) {
+	public PromptFrame(List<Page> pages, NetworkSystem netSys, boolean slave, Dimension frameSize, int offY, int speed, int direction, boolean playing, Properties prop) {
 		this.netSys = netSys;
 		this.slave = slave;
 		
 		setTitle("Prompteur");
 		setDefaultCloseOperation(3);
 		setAlwaysOnTop(prop.getBoolean("prompteur.frame.alwaysontop"));
-		setSize(prop.getDimension("prompteur.frame.size"));
-		setResizable(prop.getBoolean("prompteur.frame.resizable"));
+		setSize(frameSize);
+		if(!slave)
+			setResizable(prop.getBoolean("prompteur.frame.resizable"));
+		else
+			setResizable(false);
 		setLocationRelativeTo(null);
-		pan = new PromptPanel(this, pages, offY, speed, direction, playing, prop);
+		pan = new PromptPanel(this, pages, slave, offY, speed, direction, playing, prop);
 		
 		addKeyListener(this);
 		addMouseWheelListener(this);
 		
 		netSys.addNetworkSystemListener(this);
-		
+		addComponentListener(this);
 		setContentPane(pan);
 		
 	}
@@ -102,6 +108,19 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
     		e1.printStackTrace();
     	}
     }
+    
+	@Override
+	public void componentHidden(ComponentEvent e) {}
+	@Override
+	public void componentMoved(ComponentEvent e) {}
+	@Override
+	public void componentShown(ComponentEvent e) {}
+	
+	@Override
+	public void componentResized(ComponentEvent e) {
+		startNetworkEvent(EventNetworkSystem.CHANGE_SIZE);
+	}
+
 
 	@Override
 	public void changeDirection(NetworkSystemEvent e) {
@@ -127,6 +146,17 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
 	public void changeSpeed(NetworkSystemEvent e) {
 		netSys.getServer().sendToAll(PackagePrefab.getChangeSpeedPackage(e.getSpeed()));
 	}
+	
+	@Override
+	public void changeSize(NetworkSystemEvent e) {
+		netSys.getServer().sendToAll(PackagePrefab.getChangeSizePackage(e.getFrameSize()));
+	}
+	
+	@Override
+	public void changePage(NetworkSystemEvent e) {
+		netSys.getServer().sendToAll(PackagePrefab.getChangePagePackage(e.getPageIndex()));
+	}
+
 
 	
 	public void changeDirection() {
@@ -160,7 +190,12 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
 	}
 	
 	protected void startNetworkEvent(int event) {
-		netSys.startEvent(event, new NetworkSystemEvent(this, pan.getDirection(), pan.getTimer().getSpeed(), pan.getOffY(), !pan.getTimer().isWait()));
+		if(pan == null)
+			return;
+
+		netSys.startEvent(event, new NetworkSystemEvent(this, this.getSize(), 
+				pan.getSelectedPageIndex(), pan.getDirection(), pan.getTimer().getRealSpeed(), 
+				pan.getOffY(), !pan.getTimer().isWait()));
 	}
 	
 	public NetworkSystem getNetworkSystem() {

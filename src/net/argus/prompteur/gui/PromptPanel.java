@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import net.argus.file.Properties;
 import net.argus.prompteur.Page;
 import net.argus.prompteur.Timer;
+import net.argus.prompteur.net.event.EventNetworkSystem;
 import net.argus.prompteur.tag.Tag;
 
 public class PromptPanel extends JPanel {
@@ -59,13 +60,17 @@ public class PromptPanel extends JPanel {
 	
 	private int tabSpace = 4;
 	
+	private boolean slave;
+	
 	public static final int NONE_TAG = -1;
 	
 	
 	@SuppressWarnings("deprecation")
-	public PromptPanel(PromptFrame fen, List<Page> pages, int offY, int speed, int direction, boolean playing, Properties prop) {
+	public PromptPanel(PromptFrame fen, List<Page> pages, boolean slave, int offY, int speed, int direction, boolean playing, Properties prop) {
 		if(pages.size() == 0)
 			throw new IllegalArgumentException("No page");
+		
+		this.slave = slave;
 		
 		this.fen = fen;
 		this.pages = pages;
@@ -90,7 +95,7 @@ public class PromptPanel extends JPanel {
 		
 		fen.getNetworkSystem().setPromptPanel(this);
 		
-		this.timer = new Timer(this, speed, playing, prop);
+		this.timer = new Timer(this, slave, speed, playing, prop);
 		timer.start();
 	}
 	
@@ -417,7 +422,11 @@ public class PromptPanel extends JPanel {
     	try {reset();}
     	catch(InterruptedException e) {e.printStackTrace();}
     	
-		this.selectedPage = selectedPage;
+    	this.selectedPage = selectedPage;
+    	if(!slave) {
+	    	getPromptFrame().startNetworkEvent(EventNetworkSystem.CHANGE_PAGE);
+	    	getPromptFrame().startNetworkEvent(EventNetworkSystem.RESET);
+    	}
 	}
     
     public List<Page> getPages() {
@@ -433,12 +442,12 @@ public class PromptPanel extends JPanel {
     }
     
     public void caughtUpOffY(int offY) {
-    	if(this.offY < offY) {
-    		timer.addSpeed(1);
-    	}else {
-    		timer.addSpeed(-1);
-    	}
+    	this.offY = offY;
     }
+    
+    public int getSelectedPageIndex() {
+		return this.selectedPage;
+	}
     
     public PromptFrame getPromptFrame() {
     	return fen;

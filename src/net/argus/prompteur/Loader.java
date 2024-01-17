@@ -1,6 +1,7 @@
 package net.argus.prompteur;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -249,11 +250,12 @@ public class Loader extends JFrame {
 					return;
 				
 				int offY = cjson.getInt("offy");
+				Dimension frameSize = new Dimension(cjson.getInt("width"), cjson.getInt("height"));
 				int speed = cjson.getInt("speed");
 				int direction = cjson.getInt("direction");
 				boolean playing = cjson.getBoolean("playing");
 				
-				PromptFrame fen = Main.start0(pages, true, offY, speed, direction, playing, netSys);
+				PromptFrame fen = Main.start0(pages, true, frameSize, offY, speed, direction, playing, netSys);
 				PrompteurClientProcess process = new PrompteurClientProcess(fen, sock);
 				
 				process.start();
@@ -261,6 +263,7 @@ public class Loader extends JFrame {
 				setVisible(false);
 			}catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e1) {
 				Debug.log("Error on connection", Info.ERROR);
+				OptionPane.showDialog(null, "Master not found", "Error", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
 				netSys.clear();
 			}
 		};

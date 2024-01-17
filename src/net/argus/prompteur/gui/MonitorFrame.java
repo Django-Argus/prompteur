@@ -14,20 +14,24 @@ public class MonitorFrame extends JFrame {
 	
 	private MonitorPanel pan;
 		
-	public MonitorFrame(Timer timer, Properties prop) {
+	public MonitorFrame(Timer timer, boolean slave, Properties prop) {
 		setAlwaysOnTop(prop.getBoolean("monitor.frame.alwaysontop"));
 		setSize(prop.getDimension("monitor.frame.size"));
 		setResizable(prop.getBoolean("monitor.frame.resizable"));
 		
 		setTitle("Prompteur Monitor");
 		
-		pan = new MonitorPanel(timer, prop);
+		pan = new MonitorPanel(timer, slave, prop);
 		
 		setContentPane(pan);
 	}
 	
 	public void update() {
 		pan.update();
+	}
+	
+	public MonitorPanel getMonitorPanel() {
+		return pan;
 	}
 
 }

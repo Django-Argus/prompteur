@@ -10,6 +10,9 @@ public class EventNetworkSystem extends Event<NetworkSystemListener> {
 	public static final int RESET_SPEED = 3;
 	
 	public static final int CHANGE_SPEED = 4;
+	public static final int CHANGE_SIZE = 6;	
+	public static final int CHANGE_PAGE = 7;
+	
 	
 	@Deprecated
 	public static final int SEND_OFF_Y = 5;
@@ -35,6 +38,14 @@ public class EventNetworkSystem extends Event<NetworkSystemListener> {
 				
 			case CHANGE_SPEED:
 				listener.changeSpeed((NetworkSystemEvent) objs[0]);
+				break;
+				
+			case CHANGE_SIZE:
+				listener.changeSize((NetworkSystemEvent) objs[0]);
+				break;
+				
+			case CHANGE_PAGE:
+				listener.changePage((NetworkSystemEvent) objs[0]);
 				break;
 		}
 	}

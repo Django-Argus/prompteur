@@ -1,5 +1,6 @@
 package net.argus.prompteur.net;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import net.argus.prompteur.net.event.EventNetworkSystem;
 
 public class PackagePrefab {
 	
-	public static String getConnectionPackage(List<Page> pages, int offY, boolean playing, int speed, int direction) {
+	public static String getConnectionPackage(List<Page> pages, Dimension frameSize, int offY, boolean playing, int speed, int direction) {
 		CJSONBuilder builder = new CJSONBuilder();
 		
 		List<CJSONValue> vals = new ArrayList<CJSONValue>();
@@ -31,6 +32,9 @@ public class PackagePrefab {
 		CJSONArray array = new CJSONArray(vals);
 		
 		builder.addValue(".", "pages", array);
+		builder.addValue(".", "width", new CJSONInteger(frameSize.width));
+		builder.addValue(".", "height", new CJSONInteger(frameSize.height));
+
 		builder.addValue(".", "offy", new CJSONInteger(offY));
 		builder.addValue(".", "speed", new CJSONInteger(speed));
 		builder.addValue(".", "playing", new CJSONBoolean(playing));
@@ -78,6 +82,25 @@ public class PackagePrefab {
 				
 		builder.addValue(".", "type", new CJSONInteger(EventNetworkSystem.CHANGE_SPEED));
 		builder.addValue(".", "speed", new CJSONInteger(speed));
+		
+		return builder.getMainObject().toString();
+	}
+	
+	public static String getChangeSizePackage(Dimension size) {
+		CJSONBuilder builder = new CJSONBuilder();
+				
+		builder.addValue(".", "type", new CJSONInteger(EventNetworkSystem.CHANGE_SIZE));
+		builder.addValue(".", "width", new CJSONInteger(size.width));
+		builder.addValue(".", "height", new CJSONInteger(size.height));
+		
+		return builder.getMainObject().toString();
+	}
+	
+	public static String getChangePagePackage(int pageIndex) {
+		CJSONBuilder builder = new CJSONBuilder();
+
+		builder.addValue(".", "type", new CJSONInteger(EventNetworkSystem.CHANGE_PAGE));
+		builder.addValue(".", "page_index", new CJSONInteger(pageIndex));
 		
 		return builder.getMainObject().toString();
 	}

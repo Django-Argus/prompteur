@@ -49,8 +49,9 @@ public class PrompteurServer extends Server implements ServerListener {
 	
 	private void sendDataToNexClient(CardinalSocket sock) throws IOException {
 		String pack = PackagePrefab.getConnectionPackage(netSys.getPromptPanel().getPages(),
+				netSys.getPromptPanel().getPromptFrame().getSize(),
 				netSys.getPromptPanel().getOffY(), !netSys.getPromptPanel().getTimer().isWait(),
-				netSys.getPromptPanel().getTimer().getSpeed(), netSys.getPromptPanel().getDirection());
+				netSys.getPromptPanel().getTimer().getRealSpeed(), netSys.getPromptPanel().getDirection());
 		
 		sock.send(pack);
 	}

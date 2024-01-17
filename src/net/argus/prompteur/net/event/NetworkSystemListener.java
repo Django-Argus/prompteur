@@ -10,6 +10,8 @@ public interface NetworkSystemListener extends Listener {
 	public void resetSpeed(NetworkSystemEvent e);
 	
 	public void changeSpeed(NetworkSystemEvent e);
+	public void changeSize(NetworkSystemEvent e);
+	public void changePage(NetworkSystemEvent e);
 
 
 }

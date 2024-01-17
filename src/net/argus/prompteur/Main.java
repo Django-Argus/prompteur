@@ -1,5 +1,6 @@
 package net.argus.prompteur;
 
+import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,16 +21,22 @@ import net.argus.prompteur.net.NetworkSystem;
 
 public class Main {
 	
+	private static Loader loader;
+	
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			Loader loader = new Loader();
+			loader = new Loader();
 			loader.setVisible(true);
 		}catch(Exception e) {
 			e.printStackTrace();
 			OptionPane.showErrorDialog(null, "Prompteur", e);
 			System.exit(1);
 		}
+	}
+	
+	public static Loader getLoader() {
+		return loader;
 	}
 	
 	public static PromptFrame start(List<File> files, boolean slave, NetworkSystem netSys) {
@@ -46,12 +53,12 @@ public class Main {
 			return null;
 		}
 
-		PromptFrame fen = new PromptFrame(pages, netSys, slave, 0, 0, PromptPanel.FORWARD, false, prop);
+		PromptFrame fen = new PromptFrame(pages, netSys, slave, prop.getDimension("prompteur.frame.size"), 0, 0, PromptPanel.FORWARD, false, prop);
 		fen.setVisible(true);
 		return fen;
 	}
 	
-	public static PromptFrame start0(List<Page> pages, boolean slave, int offY, int speed, int direction, boolean playing,  NetworkSystem netSys) {
+	public static PromptFrame start0(List<Page> pages, boolean slave, Dimension frameSize, int offY, int speed, int direction, boolean playing,  NetworkSystem netSys) {
 		Properties prop = new Properties(new File("config.properties"));
 		if(!prop.exists()) {
 			OptionPane.showErrorDialog(null, "Prompteur", new FileNotFoundException("config.properties not found"));
@@ -59,7 +66,7 @@ public class Main {
 			return null;
 		}
 
-		PromptFrame fen = new PromptFrame(pages, netSys, slave, offY, speed, direction, playing, prop);
+		PromptFrame fen = new PromptFrame(pages, netSys, slave, frameSize, offY, speed, direction, playing, prop);
 		fen.setVisible(true);
 		
 		return fen;

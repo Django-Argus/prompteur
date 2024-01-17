@@ -38,7 +38,7 @@ public class MonitorPanel extends JPanel {
 	private Color background;
 	
 	@SuppressWarnings("deprecation")
-	public MonitorPanel(Timer timer, Properties prop) {
+	public MonitorPanel(Timer timer, boolean slave, Properties prop) {
 		this.timer = timer;
 		setLayout(new BorderLayout());
 		background = prop.getColor("monitor.background");
@@ -50,6 +50,9 @@ public class MonitorPanel extends JPanel {
 		pageList = new JList<String>(dataModel);
 		pageList.addListSelectionListener(getListSelectionListener());
 		pageList.setSelectedIndex(0);
+		
+		if(slave)
+			pageList.setEnabled(false);
 		
 		scroll = new JScrollPane(pageList);
 		
@@ -74,6 +77,7 @@ public class MonitorPanel extends JPanel {
 		return (e) -> {
 			if(e.getValueIsAdjusting())
 				return;
+			
 			int index = pageList.getSelectedIndex();
 			timer.getPromptPanel().setSelectedPage(index);
 			timer.getPromptPanel().repaint();
@@ -102,6 +106,12 @@ public class MonitorPanel extends JPanel {
 			dataModel.addElement(p.getName());
 	}
 	
+	public void selectPage(int pageIndex) {
+		pageList.setSelectedIndex(pageIndex);
+	}
 	
+	public int getPageIndex() {
+		return pageList.getSelectedIndex();
+	}
 
 }
