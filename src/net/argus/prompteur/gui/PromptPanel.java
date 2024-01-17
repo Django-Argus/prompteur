@@ -63,7 +63,7 @@ public class PromptPanel extends JPanel {
 	
 	
 	@SuppressWarnings("deprecation")
-	public PromptPanel(PromptFrame fen, List<Page> pages, int offY, Properties prop) {
+	public PromptPanel(PromptFrame fen, List<Page> pages, int offY, int speed, int direction, boolean playing, Properties prop) {
 		if(pages.size() == 0)
 			throw new IllegalArgumentException("No page");
 		
@@ -71,6 +71,7 @@ public class PromptPanel extends JPanel {
 		this.pages = pages;
 		
 		this.offY = offY;
+		this.direction = direction;
 		
 		this.defaultFont = prop.getFont("prompteur.font");
 		this.background = prop.getColor("prompteur.background");
@@ -89,7 +90,7 @@ public class PromptPanel extends JPanel {
 		
 		fen.getNetworkSystem().setPromptPanel(this);
 		
-		this.timer = new Timer(this, prop);
+		this.timer = new Timer(this, speed, playing, prop);
 		timer.start();
 	}
 	
@@ -429,6 +430,18 @@ public class PromptPanel extends JPanel {
     
     public int getOffY() {
     	return offY;
+    }
+    
+    public void caughtUpOffY(int offY) {
+    	if(this.offY < offY) {
+    		timer.addSpeed(1);
+    	}else {
+    		timer.addSpeed(-1);
+    	}
+    }
+    
+    public PromptFrame getPromptFrame() {
+    	return fen;
     }
 
 }

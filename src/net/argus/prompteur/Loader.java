@@ -28,7 +28,9 @@ import net.argus.cjson.value.CJSONValue;
 import net.argus.file.CardinalFile;
 import net.argus.file.Filter;
 import net.argus.gui.OptionPane;
+import net.argus.prompteur.gui.PromptFrame;
 import net.argus.prompteur.net.NetworkSystem;
+import net.argus.prompteur.net.PrompteurClientProcess;
 import net.argus.util.FileChooser;
 import net.argus.util.debug.Debug;
 import net.argus.util.debug.Info;
@@ -247,8 +249,15 @@ public class Loader extends JFrame {
 					return;
 				
 				int offY = cjson.getInt("offy");
+				int speed = cjson.getInt("speed");
+				int direction = cjson.getInt("direction");
+				boolean playing = cjson.getBoolean("playing");
 				
-				Main.start0(pages, true, offY, netSys);
+				PromptFrame fen = Main.start0(pages, true, offY, speed, direction, playing, netSys);
+				PrompteurClientProcess process = new PrompteurClientProcess(fen, sock);
+				
+				process.start();
+				
 				setVisible(false);
 			}catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e1) {
 				Debug.log("Error on connection", Info.ERROR);

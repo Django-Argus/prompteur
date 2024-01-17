@@ -15,6 +15,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import net.argus.file.Properties;
 import net.argus.gui.OptionPane;
 import net.argus.prompteur.gui.PromptFrame;
+import net.argus.prompteur.gui.PromptPanel;
 import net.argus.prompteur.net.NetworkSystem;
 
 public class Main {
@@ -31,7 +32,7 @@ public class Main {
 		}
 	}
 	
-	public static void start(List<File> files, boolean slave, NetworkSystem netSys) {
+	public static PromptFrame start(List<File> files, boolean slave, NetworkSystem netSys) {
 		List<Page> pages = new ArrayList<Page>();
 		for(File file : files) {
 			String txt = readText(file);
@@ -42,23 +43,26 @@ public class Main {
 		if(!prop.exists()) {
 			OptionPane.showErrorDialog(null, "Prompteur", new FileNotFoundException("config.properties not found"));
 			System.exit(1);
-			return;
+			return null;
 		}
 
-		PromptFrame fen = new PromptFrame(pages, netSys, slave, 0, prop);
+		PromptFrame fen = new PromptFrame(pages, netSys, slave, 0, 0, PromptPanel.FORWARD, false, prop);
 		fen.setVisible(true);
+		return fen;
 	}
 	
-	public static void start0(List<Page> pages, boolean slave, int offY, NetworkSystem netSys) {
+	public static PromptFrame start0(List<Page> pages, boolean slave, int offY, int speed, int direction, boolean playing,  NetworkSystem netSys) {
 		Properties prop = new Properties(new File("config.properties"));
 		if(!prop.exists()) {
 			OptionPane.showErrorDialog(null, "Prompteur", new FileNotFoundException("config.properties not found"));
 			System.exit(1);
-			return;
+			return null;
 		}
 
-		PromptFrame fen = new PromptFrame(pages, netSys, slave, offY, prop);
+		PromptFrame fen = new PromptFrame(pages, netSys, slave, offY, speed, direction, playing, prop);
 		fen.setVisible(true);
+		
+		return fen;
 	}
 	
 	@SuppressWarnings("resource")

@@ -5,6 +5,9 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 
 import net.argus.prompteur.gui.PromptPanel;
+import net.argus.prompteur.net.event.EventNetworkSystem;
+import net.argus.prompteur.net.event.NetworkSystemEvent;
+import net.argus.prompteur.net.event.NetworkSystemListener;
 import net.argus.util.debug.Debug;
 import net.argus.util.debug.Info;
 
@@ -23,6 +26,8 @@ public class NetworkSystem {
 	private PrompteurClient client = null;
 	
 	private PromptPanel promptPanel;
+	
+	private EventNetworkSystem event = new EventNetworkSystem();
 	
 	public NetworkSystem() {}
 	
@@ -98,6 +103,15 @@ public class NetworkSystem {
 	
 	public PromptPanel getPromptPanel() {
 		return promptPanel;
+	}
+	
+	public void addNetworkSystemListener(NetworkSystemListener listener) {
+		event.addListener(listener);
+	}
+	
+	public void startEvent(int event, NetworkSystemEvent e) {
+		if(type == SERVER_TYPE)
+			this.event.startEvent(event, e);
 	}
 	
 }

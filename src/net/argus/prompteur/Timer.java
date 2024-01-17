@@ -14,11 +14,13 @@ public class Timer extends Thread {
 	private int maxWaitFPS, minFPS, maxFPS, maxSpeed;
 	
 	private float m;
-	
+		
 	private MonitorFrame monitorFrame;
 		
-	public Timer(PromptPanel panel, Properties prop) {
+	public Timer(PromptPanel panel, int speed, boolean playing, Properties prop) {
 		this.panel = panel;
+		this.speed = speed;
+		this.wait = !playing;
 		this.maxWaitFPS = prop.getInt("prompteur.maxwaitfps");
 		this.minFPS = prop.getInt("prompteur.minfps");
 		this.maxFPS = prop.getInt("prompteur.maxfps");
@@ -30,6 +32,9 @@ public class Timer extends Thread {
 		monitorFrame.setVisible(true);
 	}
 	
+	private int count = 0;
+	private int fps = 0;
+	
 	@Override
 	public void run() {
 		while(true) {
@@ -37,8 +42,18 @@ public class Timer extends Thread {
 				panel.repaint();
 				
 			monitorFrame.update();
-
-			ThreadManager.sleep((int) (1000 / (wait?maxWaitFPS:(m * speed + minFPS))));
+			
+			int fps = (int) (1000 / (wait?maxWaitFPS:(m * speed + minFPS)));
+			if(count == this.fps / 2) {
+				this.fps = fps;
+				this.count = 0;
+				if(getPromptPanel().getPromptFrame().getNetworkSystem().getServer() != null)
+					getPromptPanel().getPromptFrame().getNetworkSystem().getServer().sendOffY(
+							getPromptPanel().getOffY());
+			}
+			
+			count++;
+			ThreadManager.sleep(fps);
 		}
 	}
 	
