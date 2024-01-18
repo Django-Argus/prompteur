@@ -36,7 +36,7 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
 		this.netSys = netSys;
 		this.slave = slave;
 		
-		setTitle("Prompteur");
+		setTitle();
 		setDefaultCloseOperation(3);
 		setAlwaysOnTop(prop.getBoolean("prompteur.frame.alwaysontop"));
 		setSize(frameSize);
@@ -102,6 +102,7 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
     			netSys.setType(NetworkSystem.SERVER_TYPE);
     			
     			netSys.getServer().open();
+    			setTitle();
     		}
     		
     	}catch(InterruptedException e1) {
@@ -196,6 +197,10 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
 		netSys.startEvent(event, new NetworkSystemEvent(this, this.getSize(), 
 				pan.getSelectedPageIndex(), pan.getDirection(), pan.getTimer().getRealSpeed(), 
 				pan.getOffY(), !pan.getTimer().isWait()));
+	}
+	
+	private void setTitle() {
+		setTitle("[Prompteur] " + (slave?("slave of " + netSys.getClient().getHost().getHostName()):(netSys.getType()==NetworkSystem.SERVER_TYPE?"master":"")));
 	}
 	
 	public NetworkSystem getNetworkSystem() {
