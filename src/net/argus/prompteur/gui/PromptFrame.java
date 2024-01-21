@@ -1,6 +1,7 @@
 package net.argus.prompteur.gui;
 
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
@@ -30,7 +31,7 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
 	
 	private NetworkSystem netSys;
 	
-	private boolean slave;
+	private boolean slave, fullScreen;
 
 	public PromptFrame(List<Page> pages, NetworkSystem netSys, boolean slave, Dimension frameSize, int offY, int speed, int direction, boolean playing, Properties prop) {
 		this.netSys = netSys;
@@ -103,6 +104,10 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
     			
     			netSys.getServer().open();
     			setTitle();
+    		}
+    		
+    		if(e.getKeyCode() == KeyEvent.VK_F11) {
+    			enterFullScreenMod();
     		}
     		
     	}catch(InterruptedException e1) {
@@ -190,6 +195,15 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
 		return netSys!=null;
 	}
 	
+	public void enterFullScreenMod() {
+		GraphicsDevice device = getGraphicsConfiguration().getDevice();
+		device.setFullScreenWindow(fullScreen?null:this);
+		
+		startNetworkEvent(EventNetworkSystem.CHANGE_SIZE);
+		
+		fullScreen = !fullScreen;
+	}
+	
 	protected void startNetworkEvent(int event) {
 		if(pan == null)
 			return;
@@ -209,6 +223,10 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
 	
 	public PromptPanel getPromptPanel() {
 		return pan;
+	}
+	
+	public boolean isFullScreen() {
+		return fullScreen;
 	}
 
 }
