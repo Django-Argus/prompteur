@@ -33,7 +33,7 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
 	
 	private boolean slave, fullScreen;
 
-	public PromptFrame(List<Page> pages, NetworkSystem netSys, boolean slave, Dimension frameSize, int offY, int speed, int direction, boolean playing, Properties prop) {
+	public PromptFrame(List<Page> pages, NetworkSystem netSys, boolean slave, Dimension frameSize, int offY, int speed, int direction, boolean mirror, boolean playing, Properties prop) {
 		this.netSys = netSys;
 		this.slave = slave;
 		
@@ -46,7 +46,7 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
 		else
 			setResizable(false);
 		setLocationRelativeTo(null);
-		pan = new PromptPanel(this, pages, slave, offY, speed, direction, playing, prop);
+		pan = new PromptPanel(this, pages, slave, offY, speed, direction, mirror, playing, prop);
 		
 		addKeyListener(this);
 		addMouseWheelListener(this);
@@ -75,7 +75,12 @@ public class PromptFrame extends JFrame implements KeyListener, MouseWheelListen
     public void keyPressed(KeyEvent e) {
     	try {
     		if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_M) {
-    			pan.getTimer().getMonitorFrame().setVisible(true);
+    			if(e.isAltDown())
+    				pan.getTimer().getMonitorFrame().setVisible(true);
+    			else {
+    				pan.setMirror(!pan.isMirror());
+    				pan.repaint();
+    			}
     		}
     		
     		if(slave)

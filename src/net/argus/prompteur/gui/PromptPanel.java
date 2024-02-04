@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,13 +61,15 @@ public class PromptPanel extends JPanel {
 	
 	private int tabSpace = 4;
 	
+	private boolean mirror = false;
+	
 	private boolean slave;
 	
 	public static final int NONE_TAG = -1;
 	
 	
 	@SuppressWarnings("deprecation")
-	public PromptPanel(PromptFrame fen, List<Page> pages, boolean slave, int offY, int speed, int direction, boolean playing, Properties prop) {
+	public PromptPanel(PromptFrame fen, List<Page> pages, boolean slave, int offY, int speed, int direction, boolean mirror, boolean playing, Properties prop) {
 		if(pages.size() == 0)
 			throw new IllegalArgumentException("No page");
 		
@@ -77,6 +80,8 @@ public class PromptPanel extends JPanel {
 		
 		this.offY = offY;
 		this.direction = direction;
+		
+		this.mirror = mirror;
 		
 		this.defaultFont = prop.getFont("prompteur.font");
 		this.background = prop.getColor("prompteur.background");
@@ -105,6 +110,11 @@ public class PromptPanel extends JPanel {
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		super.paintComponent(g2d);
 		
+		if(mirror) {
+			AffineTransform at = AffineTransform.getTranslateInstance(0, getHeight());
+			at.scale(1, -1);
+			g2d.setTransform(at);
+		}
 		drawTriangle(g2d);
 		
 		g2d.translate(triangleWidth + txtPadding, fen.getHeight() * perCentPos);
@@ -428,6 +438,14 @@ public class PromptPanel extends JPanel {
 	    	getPromptFrame().startNetworkEvent(EventNetworkSystem.RESET);
     	}
 	}
+    
+    public boolean isMirror() {
+		return mirror;
+	}
+    
+    public void setMirror(boolean mirror) {
+    	this.mirror = mirror;
+    }
     
     public List<Page> getPages() {
 		return pages;

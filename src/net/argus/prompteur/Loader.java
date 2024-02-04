@@ -255,7 +255,7 @@ public class Loader extends JFrame {
 				int direction = cjson.getInt("direction");
 				boolean playing = cjson.getBoolean("playing");
 				
-				PromptFrame fen = Main.start0(pages, true, frameSize, offY, speed, direction, playing, netSys);
+				PromptFrame fen = Main.start0(pages, true, frameSize, offY, speed, direction, false, playing, netSys);
 				PrompteurClientProcess process = new PrompteurClientProcess(fen, sock);
 				
 				process.start();

@@ -53,12 +53,12 @@ public class Main {
 			return null;
 		}
 
-		PromptFrame fen = new PromptFrame(pages, netSys, slave, prop.getDimension("prompteur.frame.size"), 0, 0, PromptPanel.FORWARD, false, prop);
+		PromptFrame fen = new PromptFrame(pages, netSys, slave, prop.getDimension("prompteur.frame.size"), 0, 0, PromptPanel.FORWARD, false, false, prop);
 		fen.setVisible(true);
 		return fen;
 	}
 	
-	public static PromptFrame start0(List<Page> pages, boolean slave, Dimension frameSize, int offY, int speed, int direction, boolean playing,  NetworkSystem netSys) {
+	public static PromptFrame start0(List<Page> pages, boolean slave, Dimension frameSize, int offY, int speed, int direction, boolean mirror, boolean playing,  NetworkSystem netSys) {
 		Properties prop = new Properties(new File("config.properties"));
 		if(!prop.exists()) {
 			OptionPane.showErrorDialog(null, "Prompteur", new FileNotFoundException("config.properties not found"));
@@ -66,7 +66,7 @@ public class Main {
 			return null;
 		}
 
-		PromptFrame fen = new PromptFrame(pages, netSys, slave, frameSize, offY, speed, direction, playing, prop);
+		PromptFrame fen = new PromptFrame(pages, netSys, slave, frameSize, offY, speed, direction, mirror, playing, prop);
 		fen.setVisible(true);
 		
 		return fen;
